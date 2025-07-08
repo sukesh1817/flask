@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance analyser</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .typing-animation {
+            animation: typing 1.5s infinite;
+        }
+
+        @keyframes typing {
+
+            0%,
+            50% {
+                opacity: 1;
+            }
+
+            51%,
+            100% {
+                opacity: 0.3;
+            }
+        }
+
+        .message-fade-in {
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .upload-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .drag-over {
+            border-color: #3b82f6 !important;
+            background: rgba(59, 130, 246, 0.1) !important;
+        }
+
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Custom scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="gradient-bg min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="glass-effect rounded-2xl p-6 mb-6">
+                <h1 class="text-4xl font-bold text-white mb-2">Insurance AI Assistant</h1>
+                <p class="text-white/80 text-lg">Upload a PDF and ask questions about it</p>
+            </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div id="uploadSection" class="glass-effect rounded-3xl shadow-2xl p-8 mb-8">
+            <div class="text-center">
+                <div id="uploadArea"
+                    class="border-2 border-dashed border-white/30 rounded-2xl p-12 transition-all duration-300 upload-hover cursor-pointer">
+                    <div id="uploadContent">
+                        <svg class="mx-auto h-16 w-16 text-white/60 mb-4" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        <h3 class="text-xl font-semibold text-white mb-2">Upload Your PDF Document</h3>
+                        <p class="text-white/70 mb-4">Drag and drop your PDF here, or click to browse</p>
+                        <button type="button"
+                            class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200">
+                            Choose PDF File
+                        </button>
+                    </div>
+                    <div id="uploadingContent" class="hidden">
+                        <div class="flex items-center justify-center space-x-2 mb-4">
+                            <div class="w-3 h-3 bg-blue-400 rounded-full pulse-animation"></div>
+                            <div class="w-3 h-3 bg-blue-400 rounded-full pulse-animation"
+                                style="animation-delay: 0.2s;"></div>
+                            <div class="w-3 h-3 bg-blue-400 rounded-full pulse-animation"
+                                style="animation-delay: 0.4s;"></div>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white mb-2">Processing Document...</h3>
+                        <p class="text-white/70">Please wait while we analyze your PDF</p>
+                    </div>
+                </div>
+                <input type="file" id="fileInput" accept=".pdf" class="hidden">
+
+                <!-- File Info -->
+                <div id="fileInfo" class="hidden mt-6 p-4 bg-white/10 rounded-xl">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <svg class="w-8 h-8 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <div class="text-left">
+                                <div id="fileName" class="text-white font-medium"></div>
+                                <div id="fileSize" class="text-white/60 text-sm"></div>
+                            </div>
+                        </div>
+                        <button id="removeFile" class="text-white/60 hover:text-red-400 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div id="chatContainer" class="glass-effect rounded-3xl shadow-2xl overflow-hidden hidden">
+            <!-- Document Header -->
+            <div class="bg-white/5 border-b border-white/10 p-4">
+                <div class="flex items-center space-x-3">
+                    <svg class="w-6 h-6 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <div>
+                        <div id="chatFileName" class="text-white font-medium"></div>
+                        <div class="text-white/60 text-sm">Document loaded - Ask me anything about it!</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Messages Area -->
+            <div id="chatMessages" class="h-96 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                <!-- Welcome Message -->
+                <div class="flex items-start space-x-3 message-fade-in">
+                    <div
+                        class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl rounded-tl-none px-4 py-3 max-w-md">
+                        <p class="text-white/90">Great! I've analyzed your document. What would you like to know about
+                            it?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-6 border-t border-white/10">
+                <form id="chatForm" class="flex items-end space-x-4">
+                    <div class="flex-1 relative">
+                        <textarea id="promptInput"
+                            placeholder="Ask questions about your document or type 'SUMMARY' in CAPS to get the summary of the document..."
+                            rows="1"
+                            class="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent resize-none max-h-32"></textarea>
+                        <!-- <div class="absolute bottom-3 right-3 text-white/40 text-xs" id="charCount">0/1000</div> -->
+                    </div>
+                    <button type="submit" id="sendButton"
+                        class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white p-3 rounded-2xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                    </button>
+                </form>
+
+                <!-- Status Indicator -->
+                <div id="statusIndicator" class="mt-3 text-center text-white/60 text-sm hidden">
+                    <div class="flex items-center justify-center space-x-2">
+                        <div class="w-2 h-2 bg-blue-400 rounded-full typing-animation"></div>
+                        <div class="w-2 h-2 bg-blue-400 rounded-full typing-animation" style="animation-delay: 0.2s;">
+                        </div>
+                        <div class="w-2 h-2 bg-blue-400 rounded-full typing-animation" style="animation-delay: 0.4s;">
+                        </div>
+                        <span class="ml-2">Analyzing document...</span>
+                    </div>
+                </div>
+
+                <!-- Upload New Document Button -->
+                <div class="mt-4 text-center">
+                    <button id="uploadNewDoc" class="text-white/60 hover:text-white text-sm transition-colors">
+                        📄 Upload a different document
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-6">
+            <p class="text-white/60 text-sm">Secure PDF Analysis • AI-Powered Document Understanding</p>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            const $uploadSection = $('#uploadSection');
+            const $chatContainer = $('#chatContainer');
+            const $uploadArea = $('#uploadArea');
+            const $fileInput = $('#fileInput');
+            const $fileInfo = $('#fileInfo');
+            const $fileName = $('#fileName');
+            const $fileSize = $('#fileSize');
+            const $chatFileName = $('#chatFileName');
+            const $promptInput = $('#promptInput');
+            const $sendButton = $('#sendButton');
+            const $chatMessages = $('#chatMessages');
+            const $statusIndicator = $('#statusIndicator');
+            const $charCount = $('#charCount');
+
+            let uploadedFile = null;
+            let isProcessing = false;
+
+            // File upload handling
+            $uploadArea.on('click', function () {
+                $fileInput.click();
+            });
+
+            // Drag and drop functionality
+            $uploadArea.on('dragover', function (e) {
+                e.preventDefault();
+                $(this).addClass('drag-over');
+            });
+
+            $uploadArea.on('dragleave', function (e) {
+                e.preventDefault();
+                $(this).removeClass('drag-over');
+            });
+
+            $uploadArea.on('drop', function (e) {
+                e.preventDefault();
+                $(this).removeClass('drag-over');
+                const files = e.originalEvent.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFileSelect(files[0]);
+                }
+            });
+
+            $fileInput.on('change', function (e) {
+                if (e.target.files.length > 0) {
+                    handleFileSelect(e.target.files[0]);
+                }
+            });
+
+            // Handle file selection
+            function handleFileSelect(file) {
+                if (file.type !== 'application/pdf') {
+                    alert('Please select a PDF file only.');
+                    return;
+                }
+
+                if (file.size > 10 * 1024 * 1024) { // 10MB limit
+                    alert('File size must be less than 10MB.');
+                    return;
+                }
+
+                uploadedFile = file;
+                
+                uploadDocument(file);
+            }
+
+            // Display file information
+            function displayFileInfo(file) {
+                $fileName.text(file.name);
+                $fileSize.text(formatFileSize(file.size));
+                $fileInfo.removeClass('hidden').addClass('fade-in');
+                $chatFileName.text(file.name);
+            }
+
+            // Format file size
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // Upload document to server
+            function uploadDocument(file) {
+                // Show uploading state
+                $('#uploadContent').addClass('hidden');
+                $('#uploadingContent').removeClass('hidden');
+
+                const formData = new FormData();
+                formData.append('pdf_file', file);
+
+                $.ajax({
+                    url: '/api/upload-pdf',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        // Hide upload section and show chat
+                        $uploadSection.addClass('hidden');
+                        $chatContainer.removeClass('hidden').addClass('slide-up');
+                        $promptInput.focus();
+                        displayFileInfo(file, response.file_name);
+                        $.ajax({
+                            url: '/api/analyse',
+                            method: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                prompt_input: "SUMMARY",
+                                document_name: uploadedFile ? uploadedFile.name : null
+                            }),
+                            beforeSend: function () {
+                                $promptInput.val('').trigger('input');
+                                isProcessing = true;
+                                $sendButton.prop('disabled', true);
+                                $statusIndicator.removeClass('hidden');
+
+                            },
+                            success: function (response) {
+                                // Handle successful response
+                                let aiResponse = 'Response received successfully!';
+
+                                if (typeof response === 'string') {
+                                    aiResponse = response;
+                                } else if (response && response.message) {
+                                    aiResponse = response.message;
+                                } else if (response && response.result) {
+                                    aiResponse = response.result;
+                                }
+
+                                addMessage(aiResponse);
+                            },
+                            error: function (xhr, status, error) {
+                                // Handle error
+                                let errorMessage = 'Sorry, something went wrong. Please try again.';
+
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    errorMessage = xhr.responseJSON.message;
+                                } else if (xhr.responseText) {
+                                    try {
+                                        const errorData = JSON.parse(xhr.responseText);
+                                        errorMessage = errorData.message || errorMessage;
+                                    } catch (e) {
+                                        // Keep default error message
+                                    }
+                                }
+
+                                addMessage(`❌ ${errorMessage}`);
+                            },
+                            complete: function () {
+                                // Reset processing state
+                                isProcessing = false;
+                                $statusIndicator.addClass('hidden');
+                                $promptInput.focus();
+
+                                // Re-enable send button if there's text
+                                if ($promptInput.val().trim().length > 0) {
+                                    $sendButton.prop('disabled', false);
+                                }
+                            }
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Failed to upload document. Please try again.');
+                        resetUploadState();
+                    }
+                });
+            }
+
+            // Reset upload state
+            function resetUploadState() {
+                $('#uploadContent').removeClass('hidden');
+                $('#uploadingContent').addClass('hidden');
+                $fileInfo.addClass('hidden');
+                uploadedFile = null;
+                $fileInput.val('');
+            }
+
+            // Remove file
+            $('#removeFile').on('click', function () {
+                resetUploadState();
+            });
+
+            // Upload new document
+            $('#uploadNewDoc').on('click', function () {
+                $chatContainer.addClass('hidden');
+                $uploadSection.removeClass('hidden');
+                $chatMessages.empty();
+                resetUploadState();
+            });
+
+            // Auto-resize textarea
+            $promptInput.on('input', function () {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 128) + 'px';
+
+                // Update character count
+                const length = $(this).val().length;
+                $charCount.text(`${length}/1000`);
+
+                // Enable/disable send button
+                $sendButton.prop('disabled', length === 0 || isProcessing);
+
+                // Change color if approaching limit
+                if (length > 900) {
+                    $charCount.addClass('text-red-400').removeClass('text-white/40');
+                } else {
+                    $charCount.addClass('text-white/40').removeClass('text-red-400');
+                }
+            });
+
+            // Handle Enter key
+            $promptInput.on('keydown', function (e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (!$sendButton.prop('disabled')) {
+                        $('#chatForm').submit();
+                    }
+                }
+            });
+
+            // Add message to chat
+            function addMessage(content, isUser = false) {
+                const messageHtml = `
+                    <div class="flex items-start space-x-3 message-fade-in ${isUser ? 'flex-row-reverse space-x-reverse' : ''}">
+                        <div class="w-8 h-8 rounded-full ${isUser ? 'bg-gradient-to-r from-green-500 to-teal-600' : 'bg-gradient-to-r from-blue-500 to-purple-600'} flex items-center justify-center flex-shrink-0">
+                            ${isUser ?
+                        '<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>' :
+                        '<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+                    }
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-sm rounded-2xl ${isUser ? 'rounded-tr-none' : 'rounded-tl-none'} px-4 py-3 max-w-md">
+                            <p class="text-white/90">${content}</p>
+                        </div>
+                    </div>
+                `;
+                $chatMessages.append(messageHtml);
+                $chatMessages.scrollTop($chatMessages[0].scrollHeight);
+            }
+
+            // Handle chat form submission
+            $('#chatForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const promptText = $promptInput.val().trim();
+                if (!promptText || isProcessing) return;
+
+                // Add user message
+                addMessage(promptText, true);
+
+                // Clear input and show processing state
+                $promptInput.val('').trigger('input');
+                isProcessing = true;
+                $sendButton.prop('disabled', true);
+                $statusIndicator.removeClass('hidden');
+
+                // Make API call with document context
+                $.ajax({
+                    url: '/api/analyse',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        prompt_input: promptText,
+                        document_name: uploadedFile ? uploadedFile.name : null
+                    }),
+                    success: function (response) {
+                        // Handle successful response
+                        let aiResponse = 'Response received successfully!';
+
+                        if (typeof response === 'string') {
+                            aiResponse = response;
+                        } else if (response && response.message) {
+                            aiResponse = response.message;
+                        } else if (response && response.result) {
+                            aiResponse = response.result;
+                        }
+
+                        addMessage(aiResponse);
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle error
+                        let errorMessage = 'Sorry, something went wrong. Please try again.';
+
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        } else if (xhr.responseText) {
+                            try {
+                                const errorData = JSON.parse(xhr.responseText);
+                                errorMessage = errorData.message || errorMessage;
+                            } catch (e) {
+                                // Keep default error message
+                            }
+                        }
+
+                        addMessage(`❌ ${errorMessage}`);
+                    },
+                    complete: function () {
+                        // Reset processing state
+                        isProcessing = false;
+                        $statusIndicator.addClass('hidden');
+                        $promptInput.focus();
+
+                        // Re-enable send button if there's text
+                        if ($promptInput.val().trim().length > 0) {
+                            $sendButton.prop('disabled', false);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
